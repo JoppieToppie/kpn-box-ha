@@ -76,7 +76,7 @@ SERVICES = {
         {
             "off_periods": (
                 "Off periods",
-                "List of {days, start, end}; an end before the start runs past midnight.",
+                "List of periods, each with days, start and end; an end before the start runs past midnight.",
                 True,
                 OBJ,
                 BLOCKS_EX,
@@ -101,7 +101,16 @@ SERVICES = {
     "set_device_schedule": (
         "Set device internet schedule",
         "Weekly periods during which a device has no internet (parental control). Replaces its schedule.",
-        {"mac": MAC, "blocked_periods": ("Blocked periods", "List of {days, start, end}.", True, OBJ, BLOCKS_EX)},
+        {
+            "mac": MAC,
+            "blocked_periods": (
+                "Blocked periods",
+                "List of periods, each with days, start and end.",
+                True,
+                OBJ,
+                BLOCKS_EX,
+            ),
+        },
     ),
     "clear_device_schedule": (
         "Clear device schedule",

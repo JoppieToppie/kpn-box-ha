@@ -93,7 +93,7 @@
       "fields": {
         "off_periods": {
           "name": "Off periods",
-          "description": "List of {days, start, end}; an end before the start runs past midnight."
+          "description": "List of periods, each with days, start and end; an end before the start runs past midnight."
         },
         "config_entry_id": {
           "name": "KPN Box",
@@ -139,7 +139,7 @@
         },
         "blocked_periods": {
           "name": "Blocked periods",
-          "description": "List of {days, start, end}."
+          "description": "List of periods, each with days, start and end."
         },
         "config_entry_id": {
           "name": "KPN Box",
