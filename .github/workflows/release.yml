@@ -1,0 +1,24 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  zip:
+    name: Attach kpn_box.zip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check the tag matches manifest.json
+        run: |
+          version=$(jq -r .version custom_components/kpn_box/manifest.json)
+          [ "v$version" = "${GITHUB_REF_NAME}" ] || { echo "Tag ${GITHUB_REF_NAME} != manifest v$version"; exit 1; }
+      - name: Zip the integration
+        run: cd custom_components/kpn_box && zip -r ../../kpn_box.zip . -x '__pycache__/*'
+      - run: gh release upload "${GITHUB_REF_NAME}" kpn_box.zip --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}

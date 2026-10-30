@@ -1,0 +1,45 @@
+name: Bug report
+description: Something in the integration doesn't work
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before posting, remove anything private from logs (passwords, public IP, serial number).
+        The diagnostics download (device page → Download diagnostics) is already redacted.
+  - type: input
+    id: model
+    attributes:
+      label: Box model and firmware
+      description: Shown on the device page in Home Assistant, e.g. KPN Box 12 / V12.C.26.04.02
+    validations:
+      required: true
+  - type: input
+    id: ha
+    attributes:
+      label: Home Assistant version
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Integration version
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Settings → System → Logs, filtered on kpn_box
+      render: text
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Attach or paste the diagnostics download if it's relevant

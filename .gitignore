@@ -1,0 +1,24 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local-only: third-party sources, files downloaded from the router, one-off probes
+ext/
+router/
+probe_*.py
+test_livebox_compat.py
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

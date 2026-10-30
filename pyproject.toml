@@ -1,0 +1,21 @@
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+extend-exclude = ["ext", "router", "probe_*.py", "test_livebox_compat.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "ASYNC"]
+ignore = ["E501", "SIM105", "ASYNC109"]  # api timeouts are passed on to aiohttp
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["F811", "B017"]  # pytest fixtures imported by name; pytest.raises(Exception) for HA errors
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+known-first-party = ["custom_components"]
+combine-as-imports = true

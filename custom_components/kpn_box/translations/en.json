@@ -1,0 +1,855 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "KPN Box",
+        "description": "Log in with the same account you use for the KPN Box web interface.",
+        "data": {
+          "host": "Host",
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-enter KPN Box password",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid username or password",
+      "cannot_connect": "Could not reach the KPN Box"
+    },
+    "abort": {
+      "already_configured": "This KPN Box is already configured",
+      "reauth_successful": "Password updated"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "KPN Box options",
+        "data": {
+          "scan_interval": "Update interval (seconds)",
+          "track_devices": "Create device trackers for connected devices",
+          "use_events": "Instant updates via the box's event channel"
+        }
+      }
+    }
+  },
+  "services": {
+    "ping": {
+      "name": "Ping from router",
+      "description": "Let the KPN Box ping a host and return the result.",
+      "fields": {
+        "host": {
+          "name": "Host",
+          "description": "Hostname or IP address to ping."
+        },
+        "ip_version": {
+          "name": "IP version",
+          "description": "IPv4 or IPv6."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_wifi_network": {
+      "name": "Set Wi-Fi network",
+      "description": "Change name, password and security of a Wi-Fi network. Devices on it must reconnect.",
+      "fields": {
+        "network": {
+          "name": "Network",
+          "description": "main, guest, extra_2g or extra_5g."
+        },
+        "ssid": {
+          "name": "Network name",
+          "description": "1-32 characters."
+        },
+        "password": {
+          "name": "Password",
+          "description": "8-63 characters."
+        },
+        "security": {
+          "name": "Security",
+          "description": "WPA mode."
+        },
+        "pmf": {
+          "name": "Protected management frames",
+          "description": "Disabled, Optional or Required."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_wifi_schedule": {
+      "name": "Set Wi-Fi schedule",
+      "description": "Weekly periods during which Wi-Fi is off. Replaces the existing schedule.",
+      "fields": {
+        "off_periods": {
+          "name": "Off periods",
+          "description": "List of {days, start, end}; an end before the start runs past midnight."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "clear_wifi_schedule": {
+      "name": "Clear Wi-Fi schedule",
+      "description": "Remove the Wi-Fi schedule.",
+      "fields": {
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_mac_filter": {
+      "name": "Set Wi-Fi MAC filter",
+      "description": "Only allow listed devices on Wi-Fi, or turn the filter off.",
+      "fields": {
+        "enabled": {
+          "name": "Enabled",
+          "description": "On = only the listed MACs may join."
+        },
+        "allowed_macs": {
+          "name": "Allowed MACs",
+          "description": "MAC addresses allowed when enabled."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_device_schedule": {
+      "name": "Set device internet schedule",
+      "description": "Weekly periods during which a device has no internet (parental control). Replaces its schedule.",
+      "fields": {
+        "mac": {
+          "name": "Device MAC",
+          "description": "MAC address of the device, e.g. AA:BB:CC:DD:EE:FF."
+        },
+        "blocked_periods": {
+          "name": "Blocked periods",
+          "description": "List of {days, start, end}."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "clear_device_schedule": {
+      "name": "Clear device schedule",
+      "description": "Remove a device's internet schedule (and block).",
+      "fields": {
+        "mac": {
+          "name": "Device MAC",
+          "description": "MAC address of the device, e.g. AA:BB:CC:DD:EE:FF."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "rename_device": {
+      "name": "Rename device",
+      "description": "Change a device's name on the KPN Box.",
+      "fields": {
+        "mac": {
+          "name": "Device MAC",
+          "description": "MAC address of the device, e.g. AA:BB:CC:DD:EE:FF."
+        },
+        "name": {
+          "name": "Name",
+          "description": "New name."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_device_type": {
+      "name": "Set device type",
+      "description": "Set the device type/icon, e.g. Desktop, Mobile, Tablet, Laptop, Game Console, Set-top Box.",
+      "fields": {
+        "mac": {
+          "name": "Device MAC",
+          "description": "MAC address of the device, e.g. AA:BB:CC:DD:EE:FF."
+        },
+        "type": {
+          "name": "Type",
+          "description": "Device type."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "remove_device": {
+      "name": "Remove device",
+      "description": "Delete a device from the box's device list.",
+      "fields": {
+        "mac": {
+          "name": "Device MAC",
+          "description": "MAC address of the device, e.g. AA:BB:CC:DD:EE:FF."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "add_static_lease": {
+      "name": "Add fixed IP address",
+      "description": "Always give a device the same IP address.",
+      "fields": {
+        "mac": {
+          "name": "Device MAC",
+          "description": "MAC address of the device, e.g. AA:BB:CC:DD:EE:FF."
+        },
+        "ip_address": {
+          "name": "IP address",
+          "description": "Address in the LAN range."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "remove_static_lease": {
+      "name": "Remove fixed IP address",
+      "description": "Remove a device's fixed IP address.",
+      "fields": {
+        "mac": {
+          "name": "Device MAC",
+          "description": "MAC address of the device, e.g. AA:BB:CC:DD:EE:FF."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "add_port_forward": {
+      "name": "Add port forward",
+      "description": "Create (or overwrite) a port-forwarding rule.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Rule name."
+        },
+        "external_port": {
+          "name": "External port",
+          "description": "Port or range, e.g. 25565 or 5000-5010."
+        },
+        "internal_port": {
+          "name": "Internal port",
+          "description": "Defaults to the external port."
+        },
+        "ip_address": {
+          "name": "Device IP",
+          "description": "Local IPv4 address."
+        },
+        "protocol": {
+          "name": "Protocol",
+          "description": "tcp, udp or both."
+        },
+        "enabled": {
+          "name": "Enabled",
+          "description": "Start enabled."
+        },
+        "source_prefix": {
+          "name": "Source",
+          "description": "Only allow this source address/prefix (optional)."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "remove_port_forward": {
+      "name": "Remove port forward",
+      "description": "Delete a port-forwarding rule by name.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Rule name as shown in Home Assistant / the web UI."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "add_ipv6_pinhole": {
+      "name": "Add IPv6 open port",
+      "description": "Open a port to a device over IPv6.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Description."
+        },
+        "port": {
+          "name": "Port",
+          "description": "Port or range."
+        },
+        "ip_address": {
+          "name": "Device IPv6",
+          "description": "Global IPv6 address of the device."
+        },
+        "protocol": {
+          "name": "Protocol",
+          "description": "tcp, udp or both."
+        },
+        "enabled": {
+          "name": "Enabled",
+          "description": "Start enabled."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "remove_ipv6_pinhole": {
+      "name": "Remove IPv6 open port",
+      "description": "Delete an IPv6 open port by its ID.",
+      "fields": {
+        "id": {
+          "name": "ID",
+          "description": "Pinhole ID (shown as the switch's 'id' attribute)."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "add_firewall_rule": {
+      "name": "Add firewall rule",
+      "description": "Create (or overwrite) a custom firewall rule. Used with firewall level Custom.",
+      "fields": {
+        "id": {
+          "name": "ID",
+          "description": "Letters, digits, - and _."
+        },
+        "chain": {
+          "name": "Chain",
+          "description": "Custom (IPv4) or Custom_V6Out."
+        },
+        "action": {
+          "name": "Action",
+          "description": "Accept, Drop or Reject."
+        },
+        "protocol": {
+          "name": "Protocol",
+          "description": "tcp, udp or both."
+        },
+        "destination_port": {
+          "name": "Destination port",
+          "description": "Port or range."
+        },
+        "source_port": {
+          "name": "Source port",
+          "description": "Port or range."
+        },
+        "destination": {
+          "name": "Destination",
+          "description": "Address/prefix."
+        },
+        "source": {
+          "name": "Source",
+          "description": "Address/prefix."
+        },
+        "ip_version": {
+          "name": "IP version",
+          "description": "4 or 6."
+        },
+        "enabled": {
+          "name": "Enabled",
+          "description": "Start enabled."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "remove_firewall_rule": {
+      "name": "Remove firewall rule",
+      "description": "Delete a custom firewall rule.",
+      "fields": {
+        "id": {
+          "name": "ID",
+          "description": "Rule ID."
+        },
+        "chain": {
+          "name": "Chain",
+          "description": "Custom or Custom_V6Out."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_firewall_policy": {
+      "name": "Set firewall chain policy",
+      "description": "Default action of a firewall chain (advanced).",
+      "fields": {
+        "chain": {
+          "name": "Chain",
+          "description": "Chain name, e.g. Custom."
+        },
+        "policy": {
+          "name": "Policy",
+          "description": "Accept, Drop or Reject."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_dmz": {
+      "name": "Set DMZ host",
+      "description": "Expose one device fully to the internet (all ports forwarded). Use with care.",
+      "fields": {
+        "ip_address": {
+          "name": "IP address",
+          "description": "Local IPv4 address of the device."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "clear_dmz": {
+      "name": "Clear DMZ",
+      "description": "Remove the DMZ host.",
+      "fields": {
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_lan": {
+      "name": "Set LAN / DHCP",
+      "description": "Change the home network. Only the fields you give change. Changing the router IP moves the box (and this integration follows).",
+      "fields": {
+        "router_ip": {
+          "name": "Router IP",
+          "description": "The box's own address."
+        },
+        "subnet_mask": {
+          "name": "Subnet mask",
+          "description": "e.g. 255.255.255.0."
+        },
+        "dhcp_enabled": {
+          "name": "DHCP server",
+          "description": "Hand out addresses."
+        },
+        "dhcp_start": {
+          "name": "DHCP start",
+          "description": "First address handed out."
+        },
+        "dhcp_end": {
+          "name": "DHCP end",
+          "description": "Last address handed out."
+        },
+        "lease_time": {
+          "name": "Lease time",
+          "description": "Seconds."
+        },
+        "dns_servers": {
+          "name": "DNS servers",
+          "description": "List of IPv4 addresses handed to devices."
+        },
+        "authoritative": {
+          "name": "Authoritative",
+          "description": "DHCP authoritative mode."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_guest_lan": {
+      "name": "Set guest network / DHCP",
+      "description": "Change the guest network. Only the fields you give change.",
+      "fields": {
+        "router_ip": {
+          "name": "Router IP",
+          "description": "The box's own address."
+        },
+        "subnet_mask": {
+          "name": "Subnet mask",
+          "description": "e.g. 255.255.255.0."
+        },
+        "dhcp_enabled": {
+          "name": "DHCP server",
+          "description": "Hand out addresses."
+        },
+        "dhcp_start": {
+          "name": "DHCP start",
+          "description": "First address handed out."
+        },
+        "dhcp_end": {
+          "name": "DHCP end",
+          "description": "Last address handed out."
+        },
+        "lease_time": {
+          "name": "Lease time",
+          "description": "Seconds."
+        },
+        "dns_servers": {
+          "name": "DNS servers",
+          "description": "List of IPv4 addresses handed to devices."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_hostname": {
+      "name": "Set hostname / domain",
+      "description": "The box's hostname and local domain.",
+      "fields": {
+        "hostname": {
+          "name": "Hostname",
+          "description": "Letters, digits and -."
+        },
+        "domain": {
+          "name": "Domain",
+          "description": "Local domain, e.g. home."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "add_dyndns_host": {
+      "name": "Add DynDNS host",
+      "description": "Keep a dynamic DNS name pointed at your public IP.",
+      "fields": {
+        "service": {
+          "name": "Service",
+          "description": "Which DynDNS provider."
+        },
+        "hostname": {
+          "name": "Hostname",
+          "description": "Your DynDNS name."
+        },
+        "username": {
+          "name": "Username",
+          "description": "Account at the service."
+        },
+        "password": {
+          "name": "Password",
+          "description": "Account password."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "remove_dyndns_host": {
+      "name": "Remove DynDNS host",
+      "description": "Remove a DynDNS host.",
+      "fields": {
+        "hostname": {
+          "name": "Hostname",
+          "description": "DynDNS name."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_dyndns_enabled": {
+      "name": "Enable/disable DynDNS",
+      "description": "Turn DynDNS updates on or off.",
+      "fields": {
+        "enabled": {
+          "name": "Enabled",
+          "description": "On or off."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "change_admin_password": {
+      "name": "Change admin password",
+      "description": "Change the KPN Box admin password; the integration keeps working with the new one.",
+      "fields": {
+        "current_password": {
+          "name": "Current password",
+          "description": "Current admin password."
+        },
+        "new_password": {
+          "name": "New password",
+          "description": "At least 8 characters."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_ipv6_delegation_length": {
+      "name": "Set IPv6 delegated prefix length",
+      "description": "Prefix size handed to routers behind the box (the web UI uses 56).",
+      "fields": {
+        "network": {
+          "name": "Network",
+          "description": "home or guest."
+        },
+        "length": {
+          "name": "Length",
+          "description": "48-64."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_phone_line": {
+      "name": "Set up phone line",
+      "description": "Configure a SIP phone line (VoIP account details from your provider).",
+      "fields": {
+        "trunk": {
+          "name": "Trunk",
+          "description": "SIP-Trunk1 or SIP-Trunk2."
+        },
+        "line": {
+          "name": "Line",
+          "description": "LINE11 (trunk 1) or LINE21 (trunk 2)."
+        },
+        "number": {
+          "name": "Phone number",
+          "description": "Your number."
+        },
+        "username": {
+          "name": "SIP username",
+          "description": "Authentication user name."
+        },
+        "password": {
+          "name": "SIP password",
+          "description": "Authentication password."
+        },
+        "registrar": {
+          "name": "Registrar",
+          "description": "SIP registrar server."
+        },
+        "outbound_proxy": {
+          "name": "Outbound proxy",
+          "description": "Optional."
+        },
+        "domain": {
+          "name": "Domain",
+          "description": "User agent domain (optional)."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "clear_phone_line": {
+      "name": "Clear phone line",
+      "description": "Remove a phone line's configuration.",
+      "fields": {
+        "trunk": {
+          "name": "Trunk",
+          "description": "SIP-Trunk1 or SIP-Trunk2."
+        },
+        "line": {
+          "name": "Line",
+          "description": "LINE11 or LINE21."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_incoming_phones": {
+      "name": "Set phones for incoming calls",
+      "description": "Which phone ports ring for a line group.",
+      "fields": {
+        "group": {
+          "name": "Group",
+          "description": "Line group, e.g. Group1."
+        },
+        "handsets": {
+          "name": "Phones",
+          "description": "Phone ports, e.g. FXS1, FXS2."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_outgoing_line": {
+      "name": "Set outgoing line",
+      "description": "Which line a phone port calls out on.",
+      "fields": {
+        "handset": {
+          "name": "Phone",
+          "description": "Phone port, e.g. FXS1."
+        },
+        "line": {
+          "name": "Line",
+          "description": "Trunk line, e.g. LINE11."
+        },
+        "number": {
+          "name": "Internal number",
+          "description": "e.g. **1 (optional)."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "start_password_recovery": {
+      "name": "Start password recovery",
+      "description": "Start the box's 'forgot password' procedure (then follow the box's instructions).",
+      "fields": {
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "reset_admin_password": {
+      "name": "Reset admin password",
+      "description": "Reset the admin password to the default on the box's sticker. The integration then asks for the new password.",
+      "fields": {
+        "confirm": {
+          "name": "Confirm",
+          "description": "Type: reset password"
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "set_wan_mode": {
+      "name": "Set WAN mode",
+      "description": "Change how the box connects to the internet. A wrong mode cuts the internet.",
+      "fields": {
+        "mode": {
+          "name": "Mode",
+          "description": "Ethernet_PPP, VDSL_PPP, ADSL_PPPOA or Ethernet_DHCP."
+        },
+        "username": {
+          "name": "PPP username",
+          "description": "Optional."
+        },
+        "password": {
+          "name": "PPP password",
+          "description": "Optional."
+        },
+        "confirm": {
+          "name": "Confirm",
+          "description": "Type: change wan mode"
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "shutdown": {
+      "name": "Shut down",
+      "description": "Turn the KPN Box off. It must be switched on again by hand.",
+      "fields": {
+        "confirm": {
+          "name": "Confirm",
+          "description": "Type: shut down"
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "call": {
+      "name": "Call any box function",
+      "description": "Run any function the KPN Box exposes and return its answer. Use 'describe' to find functions. No safety checks: you can break your connection with this.",
+      "fields": {
+        "service": {
+          "name": "Object",
+          "description": "e.g. NMC.Wifi or Devices.Device.AA:BB:CC:DD:EE:FF."
+        },
+        "method": {
+          "name": "Function",
+          "description": "e.g. get."
+        },
+        "parameters": {
+          "name": "Parameters",
+          "description": "Arguments as a mapping."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "describe": {
+      "name": "Describe box object",
+      "description": "List the functions (with arguments), settings and children of an object.",
+      "fields": {
+        "object": {
+          "name": "Object",
+          "description": "e.g. NMC, NMC.Wifi, NeMo.Intf.rad5g0, Firewall."
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    },
+    "factory_reset": {
+      "name": "Factory reset",
+      "description": "Reset the KPN Box to factory settings. All settings are lost and the box restarts.",
+      "fields": {
+        "confirm": {
+          "name": "Confirm",
+          "description": "Type: factory reset"
+        },
+        "config_entry_id": {
+          "name": "KPN Box",
+          "description": "Which box to use (only needed with more than one)."
+        }
+      }
+    }
+  }
+}

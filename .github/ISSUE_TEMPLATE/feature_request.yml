@@ -1,0 +1,16 @@
+name: Feature request
+description: Suggest a sensor, switch or action
+labels: [enhancement]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you like to see?
+    validations:
+      required: true
+  - type: textarea
+    id: api
+    attributes:
+      label: Box API details (optional)
+      description: If you found the call with `kpn_box.describe` or in the web UI's network tab, paste the service, method and parameters
+      render: yaml

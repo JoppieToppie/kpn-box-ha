@@ -1,0 +1,710 @@
+ping:
+  fields:
+    host:
+      required: true
+      example: "8.8.8.8"
+      selector:
+        text:
+    ip_version:
+      selector:
+        select:
+          options: ["IPv4", "IPv6"]
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_wifi_network:
+  fields:
+    network:
+      required: true
+      selector:
+        select:
+          options: ["main", "guest", "extra_2g", "extra_5g"]
+    ssid:
+      required: true
+      selector:
+        text:
+    password:
+      required: true
+      selector:
+        text:
+          type: "password"
+    security:
+      selector:
+        select:
+          options: ["WPA2-Personal", "WPA3-Personal", "WPA2-WPA3-Personal"]
+    pmf:
+      selector:
+        select:
+          options: ["Disabled", "Optional", "Required"]
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_wifi_schedule:
+  fields:
+    off_periods:
+      required: true
+      example: "[{\"days\": [\"mon\", \"tue\", \"wed\", \"thu\", \"fri\"], \"start\": \"22:00\", \"end\": \"07:00\"}]"
+      selector:
+        object:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+clear_wifi_schedule:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_mac_filter:
+  fields:
+    enabled:
+      required: true
+      selector:
+        boolean:
+    allowed_macs:
+      example: "[\"AA:BB:CC:DD:EE:FF\"]"
+      selector:
+        object:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_device_schedule:
+  fields:
+    mac:
+      required: true
+      example: "AA:BB:CC:DD:EE:FF"
+      selector:
+        text:
+    blocked_periods:
+      required: true
+      example: "[{\"days\": [\"mon\", \"tue\", \"wed\", \"thu\", \"fri\"], \"start\": \"22:00\", \"end\": \"07:00\"}]"
+      selector:
+        object:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+clear_device_schedule:
+  fields:
+    mac:
+      required: true
+      example: "AA:BB:CC:DD:EE:FF"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+rename_device:
+  fields:
+    mac:
+      required: true
+      example: "AA:BB:CC:DD:EE:FF"
+      selector:
+        text:
+    name:
+      required: true
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_device_type:
+  fields:
+    mac:
+      required: true
+      example: "AA:BB:CC:DD:EE:FF"
+      selector:
+        text:
+    type:
+      required: true
+      example: "Mobile"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+remove_device:
+  fields:
+    mac:
+      required: true
+      example: "AA:BB:CC:DD:EE:FF"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+add_static_lease:
+  fields:
+    mac:
+      required: true
+      example: "AA:BB:CC:DD:EE:FF"
+      selector:
+        text:
+    ip_address:
+      required: true
+      example: "192.168.2.50"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+remove_static_lease:
+  fields:
+    mac:
+      required: true
+      example: "AA:BB:CC:DD:EE:FF"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+add_port_forward:
+  fields:
+    name:
+      required: true
+      example: "Minecraft"
+      selector:
+        text:
+    external_port:
+      required: true
+      example: "25565"
+      selector:
+        text:
+    internal_port:
+      selector:
+        text:
+    ip_address:
+      required: true
+      example: "192.168.2.16"
+      selector:
+        text:
+    protocol:
+      selector:
+        select:
+          options: ["tcp", "udp", "both"]
+    enabled:
+      selector:
+        boolean:
+    source_prefix:
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+remove_port_forward:
+  fields:
+    name:
+      required: true
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+add_ipv6_pinhole:
+  fields:
+    name:
+      required: true
+      selector:
+        text:
+    port:
+      required: true
+      example: "443"
+      selector:
+        text:
+    ip_address:
+      required: true
+      selector:
+        text:
+    protocol:
+      selector:
+        select:
+          options: ["tcp", "udp", "both"]
+    enabled:
+      selector:
+        boolean:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+remove_ipv6_pinhole:
+  fields:
+    id:
+      required: true
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+add_firewall_rule:
+  fields:
+    id:
+      required: true
+      example: "ssh"
+      selector:
+        text:
+    chain:
+      selector:
+        select:
+          options: ["Custom", "Custom_V6Out"]
+    action:
+      selector:
+        select:
+          options: ["Accept", "Drop", "Reject"]
+    protocol:
+      selector:
+        select:
+          options: ["tcp", "udp", "both"]
+    destination_port:
+      selector:
+        text:
+    source_port:
+      selector:
+        text:
+    destination:
+      selector:
+        text:
+    source:
+      selector:
+        text:
+    ip_version:
+      selector:
+        select:
+          options: ["4", "6"]
+    enabled:
+      selector:
+        boolean:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+remove_firewall_rule:
+  fields:
+    id:
+      required: true
+      selector:
+        text:
+    chain:
+      selector:
+        select:
+          options: ["Custom", "Custom_V6Out"]
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_firewall_policy:
+  fields:
+    chain:
+      required: true
+      selector:
+        text:
+    policy:
+      required: true
+      selector:
+        select:
+          options: ["Accept", "Drop", "Reject"]
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_dmz:
+  fields:
+    ip_address:
+      required: true
+      example: "192.168.2.16"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+clear_dmz:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_lan:
+  fields:
+    router_ip:
+      selector:
+        text:
+    subnet_mask:
+      selector:
+        text:
+    dhcp_enabled:
+      selector:
+        boolean:
+    dhcp_start:
+      selector:
+        text:
+    dhcp_end:
+      selector:
+        text:
+    lease_time:
+      selector:
+        number:
+          min: 120
+          max: 2592000
+          mode: "box"
+    dns_servers:
+      example: "[\"1.1.1.1\", \"8.8.8.8\"]"
+      selector:
+        object:
+    authoritative:
+      selector:
+        boolean:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_guest_lan:
+  fields:
+    router_ip:
+      selector:
+        text:
+    subnet_mask:
+      selector:
+        text:
+    dhcp_enabled:
+      selector:
+        boolean:
+    dhcp_start:
+      selector:
+        text:
+    dhcp_end:
+      selector:
+        text:
+    lease_time:
+      selector:
+        number:
+          min: 120
+          max: 2592000
+          mode: "box"
+    dns_servers:
+      example: "[\"1.1.1.1\", \"8.8.8.8\"]"
+      selector:
+        object:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_hostname:
+  fields:
+    hostname:
+      selector:
+        text:
+    domain:
+      example: "home"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+add_dyndns_host:
+  fields:
+    service:
+      required: true
+      selector:
+        select:
+          options: ["dyndns", "No-IP", "ChangeIP", "GnuDIP", "AfraidFreeDNS", "Infomaniak", "OVH-dynhost"]
+    hostname:
+      required: true
+      selector:
+        text:
+    username:
+      required: true
+      selector:
+        text:
+    password:
+      required: true
+      selector:
+        text:
+          type: "password"
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+remove_dyndns_host:
+  fields:
+    hostname:
+      required: true
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_dyndns_enabled:
+  fields:
+    enabled:
+      required: true
+      selector:
+        boolean:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+change_admin_password:
+  fields:
+    current_password:
+      required: true
+      selector:
+        text:
+          type: "password"
+    new_password:
+      required: true
+      selector:
+        text:
+          type: "password"
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_ipv6_delegation_length:
+  fields:
+    network:
+      selector:
+        select:
+          options: ["home", "guest"]
+    length:
+      required: true
+      example: "56"
+      selector:
+        number:
+          min: 48
+          max: 64
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_phone_line:
+  fields:
+    trunk:
+      example: "SIP-Trunk1"
+      selector:
+        text:
+    line:
+      example: "LINE11"
+      selector:
+        text:
+    number:
+      required: true
+      selector:
+        text:
+    username:
+      required: true
+      selector:
+        text:
+    password:
+      required: true
+      selector:
+        text:
+          type: "password"
+    registrar:
+      required: true
+      selector:
+        text:
+    outbound_proxy:
+      selector:
+        text:
+    domain:
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+clear_phone_line:
+  fields:
+    trunk:
+      example: "SIP-Trunk1"
+      selector:
+        text:
+    line:
+      example: "LINE11"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_incoming_phones:
+  fields:
+    group:
+      example: "Group1"
+      selector:
+        text:
+    handsets:
+      required: true
+      example: "[\"FXS1\", \"FXS2\"]"
+      selector:
+        object:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_outgoing_line:
+  fields:
+    handset:
+      required: true
+      example: "FXS1"
+      selector:
+        text:
+    line:
+      required: true
+      example: "LINE11"
+      selector:
+        text:
+    number:
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+start_password_recovery:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+reset_admin_password:
+  fields:
+    confirm:
+      required: true
+      example: "reset password"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+set_wan_mode:
+  fields:
+    mode:
+      required: true
+      selector:
+        select:
+          options: ["Ethernet_PPP", "VDSL_PPP", "ADSL_PPPOA", "Ethernet_DHCP"]
+    username:
+      selector:
+        text:
+    password:
+      selector:
+        text:
+          type: "password"
+    confirm:
+      required: true
+      example: "change wan mode"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+shutdown:
+  fields:
+    confirm:
+      required: true
+      example: "shut down"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+call:
+  fields:
+    service:
+      required: true
+      example: "NMC.Wifi"
+      selector:
+        text:
+    method:
+      required: true
+      example: "get"
+      selector:
+        text:
+    parameters:
+      example: "{}"
+      selector:
+        object:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+describe:
+  fields:
+    object:
+      required: true
+      example: "NMC.Wifi"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
+
+factory_reset:
+  fields:
+    confirm:
+      required: true
+      example: "factory reset"
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: "kpn_box"
