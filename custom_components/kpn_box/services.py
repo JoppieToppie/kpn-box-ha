@@ -12,6 +12,7 @@ from homeassistant.const import CONF_HOST, CONF_PASSWORD
 from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.service import async_register_admin_service
 import voluptuous as vol
 
 from .api import KPNBoxError
@@ -89,6 +90,10 @@ def _coordinator(hass: HomeAssistant, call: ServiceCall) -> KPNBoxCoordinator:
 
 
 def async_setup_services(hass: HomeAssistant) -> None:
+    def register(service: str, func: Callable, **kwargs: Any) -> None:
+        # Every action can reconfigure the box or read secrets from it, so only HA admins may call them
+        async_register_admin_service(hass, DOMAIN, service, func, **kwargs)
+
     def run(fn: Callable[[KPNBoxCoordinator, dict[str, Any]], Awaitable[None]]):
         async def handler(call: ServiceCall) -> None:
             c = _coordinator(hass, call)
@@ -113,8 +118,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
             "max_ms": r.get("maximumResponseTime"),
         }
 
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "ping",
         ping,
         supports_response=SupportsResponse.ONLY,
@@ -147,8 +151,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
         vaps = tuple(v for v in ("vap2g0priv", "vap5g0priv", "vap2g0ext", "vap5g0ext") if v in c.data.private_vaps)
         await c.api.set_mac_filter(vaps, d["enabled"], d["allowed_macs"])
 
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "set_wifi_network",
         run(set_wifi_network),
         schema=_schema(
@@ -161,12 +164,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(
-        DOMAIN, "set_wifi_schedule", run(set_wifi_schedule), schema=_schema({vol.Required("off_periods"): BLOCKS})
-    )
-    hass.services.async_register(DOMAIN, "clear_wifi_schedule", run(clear_wifi_schedule), schema=_schema({}))
-    hass.services.async_register(
-        DOMAIN,
+    register("set_wifi_schedule", run(set_wifi_schedule), schema=_schema({vol.Required("off_periods"): BLOCKS}))
+    register("clear_wifi_schedule", run(clear_wifi_schedule), schema=_schema({}))
+    register(
         "set_mac_filter",
         run(set_mac_filter),
         schema=_schema(
@@ -200,39 +200,29 @@ def async_setup_services(hass: HomeAssistant) -> None:
     async def remove_static_lease(c: KPNBoxCoordinator, d: dict) -> None:
         await c.api.delete_static_lease(d["mac"])
 
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "set_device_schedule",
         run(set_device_schedule),
         schema=_schema({vol.Required("mac"): MAC, vol.Required("blocked_periods"): BLOCKS}),
     )
-    hass.services.async_register(
-        DOMAIN, "clear_device_schedule", run(clear_device_schedule), schema=_schema({vol.Required("mac"): MAC})
-    )
-    hass.services.async_register(
-        DOMAIN,
+    register("clear_device_schedule", run(clear_device_schedule), schema=_schema({vol.Required("mac"): MAC}))
+    register(
         "rename_device",
         run(rename_device),
         schema=_schema({vol.Required("mac"): MAC, vol.Required("name"): vol.All(cv.string, vol.Length(min=1, max=64))}),
     )
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "set_device_type",
         run(set_device_type),
         schema=_schema({vol.Required("mac"): MAC, vol.Required("type"): cv.string}),
     )
-    hass.services.async_register(
-        DOMAIN, "remove_device", run(remove_device), schema=_schema({vol.Required("mac"): MAC})
-    )
-    hass.services.async_register(
-        DOMAIN,
+    register("remove_device", run(remove_device), schema=_schema({vol.Required("mac"): MAC}))
+    register(
         "add_static_lease",
         run(add_static_lease),
         schema=_schema({vol.Required("mac"): MAC, vol.Required("ip_address"): IPV4}),
     )
-    hass.services.async_register(
-        DOMAIN, "remove_static_lease", run(remove_static_lease), schema=_schema({vol.Required("mac"): MAC})
-    )
+    register("remove_static_lease", run(remove_static_lease), schema=_schema({vol.Required("mac"): MAC}))
 
     # --- port forwarding, pinholes, firewall, DMZ ----------------------------
 
@@ -286,8 +276,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
     async def clear_dmz(c: KPNBoxCoordinator, d: dict) -> None:
         await c.api.clear_dmz()
 
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "add_port_forward",
         run(add_port_forward),
         schema=_schema(
@@ -302,11 +291,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(
-        DOMAIN, "remove_port_forward", run(remove_port_forward), schema=_schema({vol.Required("name"): cv.string})
-    )
-    hass.services.async_register(
-        DOMAIN,
+    register("remove_port_forward", run(remove_port_forward), schema=_schema({vol.Required("name"): cv.string}))
+    register(
         "add_ipv6_pinhole",
         run(add_ipv6_pinhole),
         schema=_schema(
@@ -319,11 +305,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(
-        DOMAIN, "remove_ipv6_pinhole", run(remove_ipv6_pinhole), schema=_schema({vol.Required("id"): cv.string})
-    )
-    hass.services.async_register(
-        DOMAIN,
+    register("remove_ipv6_pinhole", run(remove_ipv6_pinhole), schema=_schema({vol.Required("id"): cv.string}))
+    register(
         "add_firewall_rule",
         run(add_firewall_rule),
         schema=_schema(
@@ -341,8 +324,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "remove_firewall_rule",
         run(remove_firewall_rule),
         schema=_schema(
@@ -352,8 +334,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "set_firewall_policy",
         run(set_firewall_policy),
         schema=_schema(
@@ -363,8 +344,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(DOMAIN, "set_dmz", run(set_dmz), schema=_schema({vol.Required("ip_address"): IPV4}))
-    hass.services.async_register(DOMAIN, "clear_dmz", run(clear_dmz), schema=_schema({}))
+    register("set_dmz", run(set_dmz), schema=_schema({vol.Required("ip_address"): IPV4}))
+    register("clear_dmz", run(clear_dmz), schema=_schema({}))
 
     # --- LAN / DNS / DynDNS --------------------------------------------------
 
@@ -432,12 +413,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
         vol.Optional("lease_time"): vol.All(vol.Coerce(int), vol.Range(min=120)),
         vol.Optional("dns_servers"): vol.All(cv.ensure_list, [IPV4]),
     }
-    hass.services.async_register(
-        DOMAIN, "set_lan", run(set_lan), schema=_schema({**lan_fields, vol.Optional("authoritative"): cv.boolean})
-    )
-    hass.services.async_register(DOMAIN, "set_guest_lan", run(set_guest_lan), schema=_schema(lan_fields))
-    hass.services.async_register(
-        DOMAIN,
+    register("set_lan", run(set_lan), schema=_schema({**lan_fields, vol.Optional("authoritative"): cv.boolean}))
+    register("set_guest_lan", run(set_guest_lan), schema=_schema(lan_fields))
+    register(
         "set_hostname",
         run(set_hostname),
         schema=vol.All(
@@ -450,8 +428,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
             cv.has_at_least_one_key("hostname", "domain"),
         ),
     )
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "add_dyndns_host",
         run(add_dyndns),
         schema=_schema(
@@ -463,12 +440,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(
-        DOMAIN, "remove_dyndns_host", run(remove_dyndns), schema=_schema({vol.Required("hostname"): cv.string})
-    )
-    hass.services.async_register(
-        DOMAIN, "set_dyndns_enabled", run(set_dyndns_enabled), schema=_schema({vol.Required("enabled"): cv.boolean})
-    )
+    register("remove_dyndns_host", run(remove_dyndns), schema=_schema({vol.Required("hostname"): cv.string}))
+    register("set_dyndns_enabled", run(set_dyndns_enabled), schema=_schema({vol.Required("enabled"): cv.boolean}))
 
     # --- system --------------------------------------------------------------
 
@@ -521,12 +494,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
         except KPNBoxError:
             pass  # goes down right away; it has to be switched on by hand
 
-    hass.services.async_register(DOMAIN, "start_password_recovery", start_password_recovery, schema=_schema({}))
-    hass.services.async_register(
-        DOMAIN, "reset_admin_password", reset_admin_password, schema=_schema({vol.Required("confirm"): cv.string})
-    )
-    hass.services.async_register(
-        DOMAIN,
+    register("start_password_recovery", start_password_recovery, schema=_schema({}))
+    register("reset_admin_password", reset_admin_password, schema=_schema({vol.Required("confirm"): cv.string}))
+    register(
         "set_wan_mode",
         set_wan_mode,
         schema=_schema(
@@ -538,7 +508,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(DOMAIN, "shutdown", shutdown, schema=_schema({vol.Required("confirm"): cv.string}))
+    register("shutdown", shutdown, schema=_schema({vol.Required("confirm"): cv.string}))
 
     # --- telephone -------------------------------------------------------------
 
@@ -564,8 +534,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
         await c.api.set_outgoing_line(d["handset"], d.get("number", ""), d["line"])
 
     trunk = {vol.Optional("trunk", default="SIP-Trunk1"): cv.string, vol.Optional("line", default="LINE11"): cv.string}
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "set_phone_line",
         run(set_phone_line),
         schema=_schema(
@@ -580,9 +549,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(DOMAIN, "clear_phone_line", run(clear_phone_line), schema=_schema(trunk))
-    hass.services.async_register(
-        DOMAIN,
+    register("clear_phone_line", run(clear_phone_line), schema=_schema(trunk))
+    register(
         "set_incoming_phones",
         run(set_incoming_phones),
         schema=_schema(
@@ -592,8 +560,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "set_outgoing_line",
         run(set_outgoing_line),
         schema=_schema(
@@ -608,8 +575,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
     async def set_ipv6_delegation_length(c: KPNBoxCoordinator, d: dict) -> None:
         await c.api.set_ipv6_delegation_length("lan" if d["network"] == "home" else "guest", d["length"])
 
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "set_ipv6_delegation_length",
         run(set_ipv6_delegation_length),
         schema=_schema(
@@ -637,8 +603,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
         except KPNBoxError as err:
             raise HomeAssistantError(f"describe {call.data['object']} failed: {err}") from err
 
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "call",
         raw_call,
         supports_response=SupportsResponse.ONLY,
@@ -650,16 +615,14 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "describe",
         describe,
         supports_response=SupportsResponse.ONLY,
         schema=_schema({vol.Required("object"): vol.All(cv.string, vol.Match(r"^[A-Za-z0-9_.-]+$"))}),
     )
 
-    hass.services.async_register(
-        DOMAIN,
+    register(
         "change_admin_password",
         change_admin_password,
         schema=_schema(
@@ -669,6 +632,4 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         ),
     )
-    hass.services.async_register(
-        DOMAIN, "factory_reset", factory_reset, schema=_schema({vol.Required("confirm"): cv.string})
-    )
+    register("factory_reset", factory_reset, schema=_schema({vol.Required("confirm"): cv.string}))

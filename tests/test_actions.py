@@ -4,7 +4,8 @@ from datetime import time as t
 
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_HOST, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Context, HomeAssistant, ServiceCall
+from homeassistant.exceptions import Unauthorized
 from homeassistant.helpers import entity_registry as er
 import pytest
 from test_kpn_box import DOMAIN, box, clock, eid, entry  # noqa: F401 (fixtures)
@@ -289,3 +290,18 @@ async def test_factory_reset_and_firmware_install(hass: HomeAssistant, entry, bo
     await hass.services.async_call("update", "install", {"entity_id": fw}, blocking=True)
     await call(hass, "factory_reset", {"confirm": "factory reset"})
     assert box.writes == [("WebuiupgradeService", "upgrade", {}), ("NMC", "factoryReset", {})]
+
+
+async def test_actions_are_admin_only(hass: HomeAssistant, entry, box, hass_admin_user, hass_read_only_user) -> None:
+    # Every kpn_box action can reconfigure the box or read secrets from it
+    services = hass.services.async_services_for_domain(DOMAIN)
+    assert len(services) == 40
+    for service, svc in services.items():
+        # Straight to the handler: HA validates the data before the admin check would run
+        with pytest.raises(Unauthorized):
+            await svc.job.target(ServiceCall(hass, DOMAIN, service, {}, Context(user_id=hass_read_only_user.id)))
+    assert box.writes == []
+    await hass.services.async_call(
+        DOMAIN, "set_dmz", {"ip_address": "192.168.2.16"}, blocking=True, context=Context(user_id=hass_admin_user.id)
+    )
+    assert box.writes
