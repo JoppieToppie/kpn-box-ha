@@ -34,6 +34,7 @@ reach every function the box exposes, including ones its web UI never uses.
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Entities](#entities)
+- [Dashboard card](#dashboard-card)
 - [Actions](#actions)
 - [Examples](#examples)
 - [Cautions](#cautions)
@@ -103,7 +104,26 @@ Home Assistant asks for the new one.
 | **Update** | Firmware: shows when KPN offers a newer version, and **Install** runs the upgrade (the box restarts) |
 | **Device trackers** | One per device seen online since setup, with IP, interface, band, signal and link rates as attributes |
 
+## Dashboard card
+
+The integration ships a card that lists every device on your network: name, IP, MAC, connection (Wi-Fi band or
+Ethernet) and signal. Search by name, IP or MAC, click a column to sort, click a row for the device's details.
+Home Assistant loads it by itself, so there's no resource to add; pick **KPN Box devices** in the card picker or
+use YAML:
+
+```yaml
+type: custom:kpn-box-card
+title: KPN Box         # optional
+show_offline: false    # optional; true also lists devices that are offline
+```
+
+Online devices always come first. Admins also get a **Restart** button (with a confirmation); other users don't.
+The card reads the device trackers, so keep device tracking on in the integration's options.
+
 ## Actions
+
+Only Home Assistant **administrators** can run the actions below; for anyone else they fail with "Unauthorized".
+Automations and scripts still run them as before.
 
 All actions take an optional `config_entry_id`, which is only needed with more than one box. Write MAC addresses
 as `AA:BB:CC:DD:EE:FF`.

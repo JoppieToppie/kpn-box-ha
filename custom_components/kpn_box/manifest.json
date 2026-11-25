@@ -1,12 +1,18 @@
 {
   "domain": "kpn_box",
   "name": "KPN Box",
-  "codeowners": ["@JoppieToppie"],
+  "after_dependencies": [
+    "frontend",
+    "http"
+  ],
+  "codeowners": [
+    "@JoppieToppie"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/JoppieToppie/kpn-box-ha",
   "integration_type": "device",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/JoppieToppie/kpn-box-ha/issues",
   "requirements": [],
-  "version": "0.6.0"
+  "version": "0.7.0"
 }

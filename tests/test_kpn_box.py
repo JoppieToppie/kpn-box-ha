@@ -3,6 +3,7 @@
 import asyncio
 from datetime import timedelta
 import json
+from unittest.mock import patch
 
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntryState
@@ -811,3 +812,16 @@ async def test_events_refresh_immediately(hass: HomeAssistant, entry, box) -> No
             break
     laptop = reg.async_get_entity_id("device_tracker", DOMAIN, "aa:aa:aa:aa:aa:02")
     assert laptop and hass.states.get(laptop).state == "home"
+
+
+async def test_dashboard_card_is_served(hass: HomeAssistant, hass_client) -> None:
+    from homeassistant.setup import async_setup_component
+
+    assert await async_setup_component(hass, "http", {})
+    hass.config.components.add("frontend")
+    with patch("homeassistant.components.frontend.add_extra_js_url") as add_js:
+        assert await async_setup_component(hass, DOMAIN, {})
+    add_js.assert_called_once_with(hass, "/kpn_box/kpn-box-card.js?v=0.7.0")
+    resp = await (await hass_client()).get("/kpn_box/kpn-box-card.js")
+    assert resp.status == 200
+    assert 'customElements.define("kpn-box-card"' in await resp.text()

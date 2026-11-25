@@ -3,6 +3,19 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.7.0] - 2026-11-25
+
+### Security
+
+- All `kpn_box.*` actions are now admin-only. Before, any Home Assistant user, including non-admins, could call
+  them: change or reset the box password, factory reset or shut it down, open ports, set a DMZ, change DNS, and
+  read Wi-Fi and SIP secrets through `call` ([#4]). Automations and scripts are not affected.
+
+### Added
+
+- Dashboard card `custom:kpn-box-card`: every device with name, IP, MAC, connection and signal, with search and
+  sorting, and a Restart button for admins ([#6]). It loads automatically; no resource to add.
+
 ## [0.6.0] - 2026-10-30
 
 First public release.
@@ -29,4 +42,7 @@ First public release.
   port forwarding, IPv6 pinholes, firewall, DMZ, DHCP and static leases, DynDNS, status LEDs, firmware updates,
   the event channel for instant updates, diagnostics.
 
+[0.7.0]: https://github.com/JoppieToppie/kpn-box-ha/releases/tag/v0.7.0
 [0.6.0]: https://github.com/JoppieToppie/kpn-box-ha/releases/tag/v0.6.0
+[#4]: https://github.com/JoppieToppie/kpn-box-ha/issues/4
+[#6]: https://github.com/JoppieToppie/kpn-box-ha/issues/6

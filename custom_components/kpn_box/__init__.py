@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from aiohttp import DummyCookieJar
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME, Platform
@@ -9,6 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.loader import async_get_integration
 
 from .api import KPNBoxApi
 from .const import CONF_USE_EVENTS, DOMAIN
@@ -25,6 +28,7 @@ PLATFORMS = [
     Platform.UPDATE,
 ]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+CARD_URL = f"/{DOMAIN}/kpn-box-card.js"
 
 type KPNBoxConfigEntry = ConfigEntry[KPNBoxCoordinator]
 
@@ -33,7 +37,21 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     from .services import async_setup_services
 
     async_setup_services(hass)
+    if "frontend" in hass.config.components:
+        await _async_register_card(hass)
     return True
+
+
+async def _async_register_card(hass: HomeAssistant) -> None:
+    """Serve the dashboard card and load it on every dashboard, so it works without adding a resource."""
+    from homeassistant.components.frontend import add_extra_js_url
+    from homeassistant.components.http import StaticPathConfig
+
+    await hass.http.async_register_static_paths(
+        [StaticPathConfig(CARD_URL, str(Path(__file__).parent / "frontend" / "kpn-box-card.js"), True)]
+    )
+    # The version busts the browser cache after an update
+    add_extra_js_url(hass, f"{CARD_URL}?v={(await async_get_integration(hass, DOMAIN)).version}")
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: KPNBoxConfigEntry) -> bool:
